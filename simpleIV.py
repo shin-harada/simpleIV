@@ -200,6 +200,7 @@ class ModeScroll:
         n = self.offset -1
         o = self.offset +1
         for i in range(self.No):
+            if n == self.offset or o == self.offset:break
             if n < 0: 
                 n = len(imgs.imgs)-1
             im = imgs.imgs[n]
