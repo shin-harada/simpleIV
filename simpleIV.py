@@ -5,8 +5,9 @@ import cProfile
 class Image:
     def __init__(self,id, p,x,y,r,m):
         self.path = p
-
         self.id  = id
+
+        # Image
         try:
             self.img   = pygame.image.load(p).convert()
             self.thumb = pygame.transform.rotozoom(self.img,0, self.calcMul(128) )
@@ -15,7 +16,9 @@ class Image:
             return
         self.img  = self.thumb
         self.limg = None
+        self.large = False
 
+        # current
         self.x    = x
         self.y    = y
         self.rot  = r
@@ -23,12 +26,11 @@ class Image:
         self.size = 0
         self.time = 0
 
+        # target
         self.tx   = self.x
         self.ty   = self.y
         self.trot = self.rot
         self.tsize = 0
-
-        self.large = False
 
     def show(self,scr ):
         self.mul = float(self.size)/float(self.img.get_width())
@@ -102,9 +104,6 @@ class Image:
         self.tsize = 0
         self.time  = 15
     
-    def setDtlTgt( self, x, y, r, m, t ):
-        pass
-
     def inPos( self, pos ):
         x0 = pos[0] - self.x + self.img.get_width() *self.mul/2
         y0 = pos[1] - self.y + self.img.get_height()*self.mul/2
@@ -122,25 +121,6 @@ class Image:
         else:
             return float(size)/float(self.img.get_height())
 
-class ModeRandom:
-    def __init__(self):
-        self.size = 64
-
-    def resetPos( self, imgs ):
-        for im in imgs.imgs:
-            im.setTgtXY( random.random()*imgs.width, random.random()*imgs.height,
-                       random.random()*360, self.size )
-
-    def resizeScreen( self, imgs ):
-        self.resetPos( imgs )
-
-    def keySpc( self, imgs ):
-        self.resetPos( imgs )
-    def pageUp( self, imgs  ):
-        pass
-    def pageDown(self, imgs ):
-        pass
-
 class ModeCatalog:
     def __init__(self):
         self.size   = 128
@@ -151,7 +131,6 @@ class ModeCatalog:
         x = self.size/2+ int(im.id%w)*self.size
         y = self.size/2+ int(im.id/w)*self.size+self.offset
         im.setTgtXY( x, y, 0, self.size )
-        # im.moveToTarget()
 
     def resetPos( self, imgs ):
         for im in imgs.imgs:
@@ -187,15 +166,6 @@ class ModeCatalog:
         if self.offset < -ymax:
             self.offset = -ymax
         self.resetPos( imgs )
-
-    def update( self, imgs ):
-        if self.offset > 0:
-            self.offset = int(self.offset / 16.0)
-            self.resetPos( imgs )
-        w = int(imgs.width/self.size)
-        ymax = int(len(imgs.imgs)/w)*self.size
-        if self.offset < -ymax:
-            self.offset = -ymax
 
 class ModeScroll:
     def __init__(self):
@@ -282,8 +252,6 @@ class ModeScroll:
             self.offset = 0
         self.resetPos( imgs )
 
-    def update( self, imgs ):
-        pass
 
 ModeCatalog = ModeCatalog()
 ModeScroll  = ModeScroll()
@@ -312,8 +280,6 @@ class Images():
             self.mode.setPos( self, im )
             im.moveToTarget()
 
-            # self.mode.update( self )
-
         for im in self.imgs:
             im.update( scr )
 
@@ -334,7 +300,6 @@ class Images():
         self.mode.setMode( self )
 
     def toggleMode( self ):
-        # self.mode = self.modes.pop()
         m = Modes.pop()
         Modes.insert(0,m)
         self.setMode( m )
@@ -350,8 +315,6 @@ class Images():
     def resetPos( self ): self.mode.resetPos( self )
     def keySpace( self ): self.mode.keySpc( self )
 
-
-
 # Define some colors
 white=[255,255,255]
 black=[0,0,0]
@@ -359,7 +322,7 @@ black=[0,0,0]
 pygame.init()
 screen = pygame.display.set_mode([800, 600],pygame.RESIZABLE)
  
-pygame.display.set_caption('Window Name')
+pygame.display.set_caption('simpleImageViewer')
  
 background = pygame.Surface(screen.get_size())
 background.fill(black)
@@ -404,7 +367,5 @@ while done==False:
     Imgs.update( screen )
     
     pygame.display.flip()
- 
+
 pygame.quit ()
-
-
